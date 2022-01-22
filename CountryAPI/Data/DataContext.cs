@@ -13,6 +13,7 @@ namespace CountryAPI.Data
         public DbSet<Status> Statuses { get; set; } = null!;
         public DbSet<CountryItem> CountryItems { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Product> Products { get; set; } = null!;
 
     }
 }
