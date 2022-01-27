@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CountryAPI.Models
 {
@@ -12,6 +13,15 @@ namespace CountryAPI.Models
         [StringLength(20)]
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [NotMapped]
+        public string img_profile
+        {
+            get
+            {
+                return "https://localhost:7247/api/Files/uploads?fileName=";
+            }
+        }
+
     }
 
 
