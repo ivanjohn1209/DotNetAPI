@@ -122,6 +122,21 @@ namespace CountryAPI.Controllers
         }
 
 
+        [HttpGet("read")]
+        public async Task<ActionResult<Files>> ReadFile(FileDbo fileDbo)
+        {
+            try
+            {
+                var file = await _context.Files.Where(e => e.ref_file == fileDbo.ref_file && e.ref_assignto == fileDbo.ref_assignto).FirstAsync();
+                return file;
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpPost("delete")]
         public async Task<ActionResult<string>> deleteFile(FileDbo fileDbo)
         {
@@ -159,7 +174,5 @@ namespace CountryAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
     }
 }

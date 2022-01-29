@@ -41,6 +41,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//use the static files from wwwroot
+app.UseStaticFiles();
+
 app.UseAuthorization();
 app.UseCors(myAllowSpecificOrigins);
 app.MapControllers();

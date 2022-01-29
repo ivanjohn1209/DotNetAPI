@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CountryAPI.Data;
 using CountryAPI.Models;
+using CountryAPI.Controllers;
 
 namespace CountryAPI.Controllers
 {
@@ -16,10 +17,12 @@ namespace CountryAPI.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly DataContext _context;
+        public static IWebHostEnvironment _webHostEnvironment;
 
-        public ProductsController(DataContext context)
+        public ProductsController(DataContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: api/Products
@@ -28,7 +31,23 @@ namespace CountryAPI.Controllers
         {
             try
             {
-                return await _context.Products.Where(e => e.ref_assignto == productDto.ref_assignto).ToListAsync();
+                // return await _context.Products.Where(e => e.ref_assignto == productDto.ref_assignto).ToListAsync();
+                var productsList = await (from products in _context.Products
+                                         where products.ref_assignto == productDto.ref_assignto
+                                         join files in _context.Files on products.ref_product equals files.ref_assignto into tmp
+                                         from m in tmp.DefaultIfEmpty()
+
+                                         select new Product
+                                         {
+                                             Id = products.Id,
+                                             ref_assignto = products.ref_assignto,
+                                             ref_product = products.ref_product,
+                                             Name = products.Name,
+                                             Description = products.Description,
+                                             img_profile = m.Url,
+                                         }
+                                  ).ToListAsync();
+                return productsList;
             }
             catch
             {
@@ -38,17 +57,34 @@ namespace CountryAPI.Controllers
 
         // GET: api/Products/5
         [HttpPost("read")]
-        public async Task<ActionResult<Product>> GetProduct(ProductDto productDto)
+        public async Task<ActionResult<object>> GetProduct(ProductDto productDto)
         {
 
             try
             {
-                var product = await _context.Products.Where(e => e.ref_assignto == productDto.ref_assignto && e.ref_product == productDto.ref_product).FirstAsync();
-                return product;
+                /*
+                var product = await _context.Products
+                    .Where(e => e.ref_assignto == productDto.ref_assignto && e.ref_product == productDto.ref_product).FirstAsync();*/
+                var productItem = await (from products in _context.Products 
+                                         where products.ref_product == productDto.ref_product && products.ref_assignto == productDto.ref_assignto
+                                         join files in _context.Files on productDto.ref_product equals files.ref_assignto into tmp
+                                         from m in tmp.DefaultIfEmpty()
+
+                                         select new Product
+                                         {
+                                             Id = products.Id,
+                                             ref_assignto = products.ref_assignto,
+                                             ref_product = products.ref_product,
+                                             Name=products.Name,
+                                             Description = products.Description,
+                                             img_profile = m.Url,
+                                         }
+                                        ).FirstAsync();
+               return productItem;
             }
-            catch
+            catch(Exception ex)
             {
-                 return NotFound();
+                 return NotFound(ex.Message);
             }
         }
 

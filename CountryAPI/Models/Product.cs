@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using CountryAPI.Models;
 
 namespace CountryAPI.Models
 {
     public class Product
     {
+
+       
         public int Id { get; set; }
         [Required(ErrorMessage = "ref_assignto is required.")]
         public Guid ref_assignto { get; set; }
@@ -14,14 +17,9 @@ namespace CountryAPI.Models
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         [NotMapped]
-        public string img_profile
-        {
-            get
-            {
-                return "https://localhost:7247/api/Files/uploads?fileName=";
-            }
-        }
-
+        public string img_profile { get; set; } = string.Empty;
+       /* [ForeignKey("ref_product")]
+        public Files? Files { get; set; }*/
     }
 
 
