@@ -27,25 +27,26 @@ namespace CountryAPI.Controllers
 
         // GET: api/Products
         [HttpPost("list")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(ProductListDto productDto)
+        public async Task<ActionResult<IEnumerable<object>>> GetProducts(ProductListDto productDto)
         {
             try
             {
                 // return await _context.Products.Where(e => e.ref_assignto == productDto.ref_assignto).ToListAsync();
+                // fix the issue of multiple image in one product because it will return multiple product if the image of product is multiple
+                //https://stackoverflow.com/questions/492683/how-to-limit-a-linq-left-outer-join-to-one-row
                 var productsList = await (from products in _context.Products
                                          where products.ref_assignto == productDto.ref_assignto
-                                         join files in _context.Files on products.ref_product equals files.ref_assignto into tmp
-                                         from m in tmp.DefaultIfEmpty()
+                                         let f = _context.Files.Where(p2 => products.ref_product == p2.ref_assignto).FirstOrDefault()
 
-                                         select new Product
-                                         {
-                                             Id = products.Id,
-                                             ref_assignto = products.ref_assignto,
-                                             ref_product = products.ref_product,
-                                             Name = products.Name,
-                                             Description = products.Description,
-                                             img_profile = m.Url,
-                                         }
+                                        select new Product
+                                        {
+                                            Id = products.Id,
+                                            ref_assignto = products.ref_assignto,
+                                            ref_product = products.ref_product,
+                                            Name = products.Name,
+                                            Description = products.Description,
+                                            img_profile = f == null ? null : f.Url,
+                                        }
                                   ).ToListAsync();
                 return productsList;
             }
