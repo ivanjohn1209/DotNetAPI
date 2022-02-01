@@ -16,6 +16,8 @@ namespace CountryAPI.Data
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<Service> Services { get; set; } = null!;
         public DbSet<Files> Files { get; set; } = null!;
+        public DbSet<Price> Prices { get; set; } = null!;
+
 
     }
 }
